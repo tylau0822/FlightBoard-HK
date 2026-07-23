@@ -8,57 +8,66 @@
 import SwiftUI
 
 struct FlightListView: View {
-    @StateObject var viewModel = FlightListViewModel()
+    @StateObject var viewModel: FlightListViewModel
+    
+    init() {
+        let apiService = APIService()
+        let repository = FlightRepository(api: apiService)
+        
+        _viewModel = StateObject(
+            wrappedValue: FlightListViewModel(repository: repository)
+        )
+    }
     
     var body: some View {
         List(viewModel.flights) { flight in
-            VStack {
-                HStack {
-                    Text(flight.scheduledTime)
-                    ForEach(flight.destinations, id: \.self) { destination in
-                        Text(destination)
+            HStack(alignment: .top, spacing: 16) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("FLIGHT")
+                        .foregroundStyle(.gray)
+                        .font(.system(size: 12))
+
+                    ForEach(flight.flights, id: \.self) { airline in
+                        Text(airline.flightNumber)
                     }
-                    
-                    Spacer()
-                    Text(flight.status)
-                }
+                }.frame(width: 100, alignment: .leading)
+                
                 
                 Divider()
                 
-                HStack(alignment: .top, spacing: 16) {
-                    VStack(alignment: .leading) {
-                        ForEach(flight.flights, id: \.self) { airline in
-                            Text(airline.flightNumber)
-                        }
-                    }.frame(width: 100, alignment: .leading)
-                    
-                    Divider()
-                    
-                    VStack {
-                        HStack {
-                            Text("TERMINAL")
-                            Spacer()
-                            Text(flight.terminal ?? "-")
+                VStack(alignment: .leading, spacing: 16) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("TIME")
+                                .foregroundStyle(.gray)
+                                .font(.system(size: 12))
+                            Text(flight.scheduledTime)
                         }
                         
-                        HStack {
-                            Text("CHECK-IN")
-                            Spacer()
-                            Text(flight.checkInAisle ?? "-")
-                        }
+                        Spacer()
                         
-                        HStack {
-                            Text("GATE")
-                            Spacer()
-                            Text(flight.gate ?? "-")
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("DESTINATION")
+                                .foregroundStyle(.gray)
+                                .font(.system(size: 12))
+                            ForEach(flight.destinations, id: \.self) { destination in
+                                Text(destination)
+                            }
                         }
                     }
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("STATUS")
+                            .foregroundStyle(.gray)
+                            .font(.system(size: 12))
+                        Text(flight.status)
+                    }
+                    Spacer()
                 }
             }
         }.listRowSpacing(16)
+        .task {
+            await viewModel.loadFlights()
+        }
     }
-}
-
-#Preview {
-    FlightListView()
 }

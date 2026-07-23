@@ -7,7 +7,14 @@
 
 import Foundation
 
-struct FlightSchedule: Identifiable {
+struct FlightResponse: Codable {
+    let date: String
+    let arrival: Bool
+    let cargo: Bool
+    let list: [FlightSchedule]
+}
+
+struct FlightSchedule: Identifiable, Codable {
     let id = UUID()
     
     let scheduledTime: String
@@ -33,7 +40,7 @@ struct FlightSchedule: Identifiable {
     }
 }
 
-struct Flight: Hashable {
+struct Flight: Hashable, Codable {
     let flightNumber: String
     let airlineCode: String
     
