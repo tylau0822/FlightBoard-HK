@@ -23,16 +23,46 @@ struct FlightListView: View {
     }
     
     var body: some View {
-        List(viewModel.flights) { flight in
-            FlightRowView(
-                flight: flight,
-                cityName: viewModel.cityName(
-                    for: flight.locationCode?.first ?? "")
-            )
-        }.listRowSpacing(16)
-        .background(Color(.systemGroupedBackground))
+        VStack {
+            controlsBar
+            
+            content
+        }
         .task {
             await viewModel.loadFlights()
         }
+    }
+    
+    private var controlsBar: some View {
+        HStack {
+            searchField
+        }.padding(.horizontal)
+        .padding(.vertical, 8)
+    }
+    
+    private var searchField: some View {
+        HStack {
+            Image(systemName: "magnifyingglass")
+                .foregroundStyle(.secondary)
+            
+            TextField(category == .arrival ? "Flight Number / Origin" : "Flight Number / Destination", text: $viewModel.searchText)
+                .autocorrectionDisabled()
+        }.padding(8)
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+    
+    private var content: some View {
+        List {
+            ForEach(viewModel.visibleFlights) { flight in
+                FlightRowView(
+                    flight: flight,
+                    cityName: viewModel.cityName(
+                        for: flight.locationCode?.first ?? "")
+                )
+            }
+        }
+        .listRowSpacing(16)
+        .background(Color(.systemGroupedBackground))
     }
 }
