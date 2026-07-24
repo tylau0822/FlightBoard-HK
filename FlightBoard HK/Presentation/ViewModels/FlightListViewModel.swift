@@ -15,7 +15,9 @@ class FlightListViewModel: ObservableObject {
         didSet { filterFlights() }
     }
     
-    var selectedDate: Date
+    @Published var selectedDate: Date {
+        didSet { Task { await loadFlights() } }
+    }
     
     let category: FlightCategory
     let flightRepository: FlightRepositoryProtocol

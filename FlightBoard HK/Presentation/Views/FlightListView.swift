@@ -9,7 +9,9 @@ import SwiftUI
 
 struct FlightListView: View {
     let category: FlightCategory
+    
     @StateObject var viewModel: FlightListViewModel
+    @State var isShowingDatePicker = false
     
     init(category: FlightCategory) {
         let apiService = APIService()
@@ -28,6 +30,9 @@ struct FlightListView: View {
             
             content
         }
+        .sheet(isPresented: $isShowingDatePicker) {
+            DatePickerView(selectedDate: $viewModel.selectedDate, isPresented: $isShowingDatePicker)
+        }
         .task {
             await viewModel.loadFlights()
         }
@@ -36,6 +41,14 @@ struct FlightListView: View {
     private var controlsBar: some View {
         HStack {
             searchField
+            
+            Button {
+                isShowingDatePicker = true
+            } label: {
+                Image(systemName: "calendar")
+                    .foregroundStyle(.black.opacity(0.8))
+            }
+            
         }.padding(.horizontal)
         .padding(.vertical, 8)
     }
@@ -53,16 +66,23 @@ struct FlightListView: View {
     }
     
     private var content: some View {
-        List {
-            ForEach(viewModel.visibleFlights) { flight in
-                FlightRowView(
-                    flight: flight,
-                    cityName: viewModel.cityName(
-                        for: flight.locationCode?.first ?? "")
-                )
+        VStack(alignment: .leading) {
+            Text(DateFormatting.dateString(from: viewModel.selectedDate))
+                .font(.headline)
+                .padding()
+            
+            List {
+                ForEach(viewModel.visibleFlights) { flight in
+                    FlightRowView(
+                        flight: flight,
+                        cityName: viewModel.cityName(
+                            for: flight.locationCode?.first ?? "")
+                    )
+                }
             }
-        }
-        .listRowSpacing(16)
-        .background(Color(.systemGroupedBackground))
+            .contentMargins(.top, 0)
+            .listRowSpacing(16)
+        }.background(Color(.systemGroupedBackground))
+        
     }
 }
