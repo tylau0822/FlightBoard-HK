@@ -10,16 +10,22 @@ import Combine
 
 class FlightListViewModel: ObservableObject {
     @Published var flights: [FlightSchedule] = []
+    var selectedDate: Date
     
+    let category: FlightCategory
     let repository: FlightRepositoryProtocol
     
-    init(repository: FlightRepositoryProtocol) {
+    init(category: FlightCategory,
+         repository: FlightRepositoryProtocol,
+         initialDate: Date = Date()) {
+        self.category = category
         self.repository = repository
+        self.selectedDate = initialDate
     }
     
     func loadFlights() async {
         do {
-            flights = try await repository.getFlights()
+            flights = try await repository.getFlights(date: selectedDate, category: category)
         } catch {
             print(error.localizedDescription)
         }

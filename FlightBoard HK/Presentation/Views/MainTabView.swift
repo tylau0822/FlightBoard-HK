@@ -13,19 +13,14 @@ struct MainTabView: View {
 
         TabView {
 
-            FlightListView()
+            FlightListView(category: .arrival)
             .tabItem {
                 Label("Arrival", systemImage: "airplane.arrival")
             }
 
-            FlightListView()
+            FlightListView(category: .departure)
             .tabItem {
                 Label("Departure", systemImage: "airplane.departure")
-            }
-
-            FlightListView()
-            .tabItem {
-                Label("Cargo", systemImage: "shippingbox")
             }
         }
     }

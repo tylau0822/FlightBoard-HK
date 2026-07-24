@@ -8,14 +8,16 @@
 import SwiftUI
 
 struct FlightListView: View {
+    let category: FlightCategory
     @StateObject var viewModel: FlightListViewModel
     
-    init() {
+    init(category: FlightCategory) {
         let apiService = APIService()
         let repository = FlightRepository(api: apiService)
         
+        self.category = category
         _viewModel = StateObject(
-            wrappedValue: FlightListViewModel(repository: repository)
+            wrappedValue: FlightListViewModel(category: category, repository: repository)
         )
     }
     
@@ -47,10 +49,14 @@ struct FlightListView: View {
                         Spacer()
                         
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("DESTINATION")
+                            Text(
+                                flight.type == .arrival
+                                ? "ORIGIN"
+                                : "DESTINATION"
+                            )
                                 .foregroundStyle(.gray)
                                 .font(.system(size: 12))
-                            ForEach(flight.destinations, id: \.self) { destination in
+                            ForEach(flight.locationCode ?? [], id: \.self) { destination in
                                 Text(destination)
                             }
                         }
