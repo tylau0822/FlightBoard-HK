@@ -13,21 +13,28 @@ class FlightListViewModel: ObservableObject {
     var selectedDate: Date
     
     let category: FlightCategory
-    let repository: FlightRepositoryProtocol
+    let flightRepository: FlightRepositoryProtocol
+    let airportRepository: AirportRepositoryProtocol
     
     init(category: FlightCategory,
-         repository: FlightRepositoryProtocol,
+         flightRepository: FlightRepositoryProtocol,
+         airportRepository: AirportRepositoryProtocol,
          initialDate: Date = Date()) {
         self.category = category
-        self.repository = repository
+        self.flightRepository = flightRepository
+        self.airportRepository = airportRepository
         self.selectedDate = initialDate
     }
     
     func loadFlights() async {
         do {
-            flights = try await repository.getFlights(date: selectedDate, category: category)
+            flights = try await flightRepository.getFlights(date: selectedDate, category: category)
         } catch {
             print(error.localizedDescription)
         }
+    }
+    
+    func cityName(for code: String) -> String {
+        airportRepository.city(for: code)
     }
 }

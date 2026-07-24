@@ -13,11 +13,12 @@ struct FlightListView: View {
     
     init(category: FlightCategory) {
         let apiService = APIService()
-        let repository = FlightRepository(api: apiService)
+        let flightRepository = FlightRepository(api: apiService)
+        let airportRepository = AirportRepository()
         
         self.category = category
         _viewModel = StateObject(
-            wrappedValue: FlightListViewModel(category: category, repository: repository)
+            wrappedValue: FlightListViewModel(category: category, flightRepository: flightRepository, airportRepository: airportRepository)
         )
     }
     
@@ -38,7 +39,7 @@ struct FlightListView: View {
                 Divider()
                 
                 VStack(alignment: .leading, spacing: 16) {
-                    HStack {
+                    HStack(alignment: .top) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("TIME")
                                 .foregroundStyle(.gray)
@@ -58,6 +59,7 @@ struct FlightListView: View {
                                 .font(.system(size: 12))
                             ForEach(flight.locationCode ?? [], id: \.self) { destination in
                                 Text(destination)
+                                Text(viewModel.cityName(for: destination))
                             }
                         }
                     }
