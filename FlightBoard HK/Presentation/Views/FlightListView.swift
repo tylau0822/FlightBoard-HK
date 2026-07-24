@@ -24,56 +24,13 @@ struct FlightListView: View {
     
     var body: some View {
         List(viewModel.flights) { flight in
-            HStack(alignment: .top, spacing: 16) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("FLIGHT")
-                        .foregroundStyle(.gray)
-                        .font(.system(size: 12))
-
-                    ForEach(flight.flights, id: \.self) { airline in
-                        Text(airline.flightNumber)
-                    }
-                }.frame(width: 100, alignment: .leading)
-                
-                
-                Divider()
-                
-                VStack(alignment: .leading, spacing: 16) {
-                    HStack(alignment: .top) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("TIME")
-                                .foregroundStyle(.gray)
-                                .font(.system(size: 12))
-                            Text(flight.scheduledTime)
-                        }
-                        
-                        Spacer()
-                        
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(
-                                flight.type == .arrival
-                                ? "ORIGIN"
-                                : "DESTINATION"
-                            )
-                                .foregroundStyle(.gray)
-                                .font(.system(size: 12))
-                            ForEach(flight.locationCode ?? [], id: \.self) { destination in
-                                Text(destination)
-                                Text(viewModel.cityName(for: destination))
-                            }
-                        }
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("STATUS")
-                            .foregroundStyle(.gray)
-                            .font(.system(size: 12))
-                        Text(flight.status)
-                    }
-                    Spacer()
-                }
-            }
+            FlightRowView(
+                flight: flight,
+                cityName: viewModel.cityName(
+                    for: flight.locationCode?.first ?? "")
+            )
         }.listRowSpacing(16)
+        .background(Color(.systemGroupedBackground))
         .task {
             await viewModel.loadFlights()
         }

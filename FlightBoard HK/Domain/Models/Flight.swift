@@ -25,7 +25,7 @@ struct FlightSchedule: Identifiable, Hashable {
     let id = UUID()
     
     let scheduledTime: String
-    let flights: [Flight]
+    let airlines: [Airline]
     let status: String
     let statusCode: String?
     
@@ -42,7 +42,7 @@ struct FlightSchedule: Identifiable, Hashable {
     let type: FlightCategory
 }
 
-struct Flight: Hashable, Codable {
+struct Airline: Hashable, Codable {
     let flightNumber: String
     let airlineCode: String
     
@@ -54,7 +54,7 @@ struct Flight: Hashable, Codable {
 
 struct DepartureFlightSchedule: Codable {
     let scheduledTime: String
-    let flights: [Flight]
+    let airlines: [Airline]
     let status: String
     let statusCode: String?
 
@@ -66,7 +66,7 @@ struct DepartureFlightSchedule: Codable {
     
     enum CodingKeys: String, CodingKey {
         case scheduledTime = "time"
-        case flights = "flight"
+        case airlines = "flight"
         case status
         case statusCode
         case destinations = "destination"
@@ -78,7 +78,7 @@ struct DepartureFlightSchedule: Codable {
 
 struct ArrivalFlightSchedule: Codable {
     let scheduledTime: String
-    let flights: [Flight]
+    let airlines: [Airline]
     let status: String
     let statusCode: String?
 
@@ -91,7 +91,7 @@ struct ArrivalFlightSchedule: Codable {
     
     enum CodingKeys: String, CodingKey {
         case scheduledTime = "time"
-        case flights = "flight"
+        case airlines = "flight"
         case status
         case statusCode
         case origins = "origin"
@@ -106,7 +106,7 @@ extension DepartureFlightSchedule {
     func toDomain() -> FlightSchedule {
         FlightSchedule(
             scheduledTime: scheduledTime,
-            flights: flights,
+            airlines: airlines,
             status: status,
             statusCode: statusCode,
             locationCode: destinations,
@@ -125,7 +125,7 @@ extension ArrivalFlightSchedule {
     func toDomain() -> FlightSchedule {
         FlightSchedule(
             scheduledTime: scheduledTime,
-            flights: flights,
+            airlines: airlines,
             status: status,
             statusCode: statusCode,
             locationCode: origins,
@@ -137,5 +137,27 @@ extension ArrivalFlightSchedule {
             stand: stand,
             type: .arrival
         )
+    }
+}
+
+extension FlightSchedule {
+    var primaryFlightNumber: String {
+        return airlines.first?.flightNumber ?? "-"
+    }
+    
+    var primaryLocationCode: String {
+        return locationCode?.first ?? "-"
+    }
+    
+    var codeshareCount: Int {
+        max(0, airlines.count - 1)
+    }
+    
+    var iataCode: String {
+        primaryFlightNumber.components(separatedBy: " ").first ?? ""
+    }
+    
+    var logoURL: URL? {
+        URL(string: "https://images.kiwi.com/airlines/64/\(iataCode).png")
     }
 }
