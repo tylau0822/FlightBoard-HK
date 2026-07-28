@@ -8,15 +8,12 @@
 import Foundation
 import Combine
 
+@MainActor
 class FlightListViewModel: ObservableObject {
     @Published var visibleFlights: [FlightSchedule] = []
     
     @Published var searchText: String = "" {
         didSet { filterFlights() }
-    }
-    
-    @Published var selectedDate: Date {
-        didSet { Task { await loadFlights() } }
     }
     
     let category: FlightCategory
@@ -27,17 +24,15 @@ class FlightListViewModel: ObservableObject {
     
     init(category: FlightCategory,
          flightRepository: FlightRepositoryProtocol,
-         airportRepository: AirportRepositoryProtocol,
-         initialDate: Date = Date()) {
+         airportRepository: AirportRepositoryProtocol){
         self.category = category
         self.flightRepository = flightRepository
         self.airportRepository = airportRepository
-        self.selectedDate = initialDate
     }
     
-    func loadFlights() async {
+    func loadFlights(date: Date) async {
         do {
-            allFlights = try await flightRepository.getFlights(date: selectedDate, category: category)
+            allFlights = try await flightRepository.getFlights(date: date, category: category)
             filterFlights()
         } catch {
             print(error.localizedDescription)

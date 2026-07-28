@@ -10,9 +10,12 @@ import SwiftData
 
 @main
 struct FlightBoard_HKApp: App {
+    @StateObject private var state = FlightBoardState()
+    
     var body: some Scene {
         WindowGroup {
-            MainTabView()
+            MainFlightBoardView()
+                .environmentObject(state)
         }
     }
 }

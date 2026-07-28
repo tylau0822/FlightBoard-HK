@@ -29,7 +29,7 @@ struct FlightStatusBadge: View {
         if status.contains("Cancelled") {
             return .red
         }
-
-        return .green
+        
+        return !status.isEmpty ? .green : .white
     }
 }

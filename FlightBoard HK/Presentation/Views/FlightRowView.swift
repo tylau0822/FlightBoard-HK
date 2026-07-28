@@ -62,22 +62,30 @@ struct FlightRowView: View {
                 if flight.type == .arrival {
                     InfoChip(
                         title: "Parking Stand",
-                        value: flight.stand ?? "-"
+                        value: flight.stand?.isEmpty == false
+                        ? flight.stand!
+                        : "-"
                     )
 
                     InfoChip(
                         title: "Hall",
-                        value: flight.hall ?? "-"
+                        value: flight.hall?.isEmpty == false
+                        ? flight.hall!
+                        : "-"
                     )
                     
                     InfoChip(
                         title: "Belt",
-                        value: flight.baggage ?? "-"
+                        value: flight.baggage?.isEmpty == false
+                        ? flight.baggage!
+                        : "-"
                     )
                 } else {
                     InfoChip(
                         title: "Gate",
-                        value: flight.gate ?? "-"
+                        value: flight.gate?.isEmpty == false
+                        ? flight.gate!
+                        : "-"
                     )
 
                     InfoChip(
@@ -89,7 +97,9 @@ struct FlightRowView: View {
                     
                     InfoChip(
                         title: "Check-in",
-                        value: flight.checkInAisle ?? "-"
+                        value: flight.checkInAisle?.isEmpty == false
+                        ? flight.checkInAisle!
+                        : "-"
                     )
                 }
                                

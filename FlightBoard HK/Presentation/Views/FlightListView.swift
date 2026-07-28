@@ -8,66 +8,12 @@
 import SwiftUI
 
 struct FlightListView: View {
-    let category: FlightCategory
-    
-    @StateObject var viewModel: FlightListViewModel
-    @State var isShowingDatePicker = false
-    
-    init(category: FlightCategory) {
-        let apiService = APIService()
-        let flightRepository = FlightRepository(api: apiService)
-        let airportRepository = AirportRepository()
-        
-        self.category = category
-        _viewModel = StateObject(
-            wrappedValue: FlightListViewModel(category: category, flightRepository: flightRepository, airportRepository: airportRepository)
-        )
-    }
+    @EnvironmentObject var boardState: FlightBoardState
+    @ObservedObject var viewModel: FlightListViewModel
     
     var body: some View {
-        VStack {
-            controlsBar
-            
-            content
-        }
-        .sheet(isPresented: $isShowingDatePicker) {
-            DatePickerView(selectedDate: $viewModel.selectedDate, isPresented: $isShowingDatePicker)
-        }
-        .task {
-            await viewModel.loadFlights()
-        }
-    }
-    
-    private var controlsBar: some View {
-        HStack {
-            searchField
-            
-            Button {
-                isShowingDatePicker = true
-            } label: {
-                Image(systemName: "calendar")
-                    .foregroundStyle(.black.opacity(0.8))
-            }
-            
-        }.padding(.horizontal)
-        .padding(.vertical, 8)
-    }
-    
-    private var searchField: some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundStyle(.secondary)
-            
-            TextField(category == .arrival ? "Flight Number / Origin" : "Flight Number / Destination", text: $viewModel.searchText)
-                .autocorrectionDisabled()
-        }.padding(8)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-    }
-    
-    private var content: some View {
         VStack(alignment: .leading) {
-            Text(DateFormatting.dateString(from: viewModel.selectedDate))
+            Text(DateFormatting.dateString(from: boardState.selectedDate))
                 .font(.headline)
                 .padding()
             
@@ -83,6 +29,5 @@ struct FlightListView: View {
             .contentMargins(.top, 0)
             .listRowSpacing(16)
         }.background(Color(.systemGroupedBackground))
-        
     }
 }
